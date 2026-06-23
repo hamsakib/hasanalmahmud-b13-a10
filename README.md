@@ -2,10 +2,12 @@
 
 **ReSell Hub** is a modern, full-stack online marketplace where users can safely buy and sell pre-owned products. This repository contains the **client (frontend)** application built with React + Vite.
 
-## 🌐 Live URL
+## 🌐 Live URL & Links
 
-- **Live Site:** _add your deployed URL here_ (e.g. https://resell-hub.web.app)
-- **Server Repo:** _add your server repo URL here_
+- **Live Site:** https://hasanalmahmud-b13-a10.vercel.app
+- **API Server:** https://hasanalmahmud-b13-a10-server.vercel.app
+- **Client Repo:** https://github.com/hamsakib/hasanalmahmud-b13-a10
+- **Server Repo:** https://github.com/hamsakib/hasanalmahmud-b13-a10-server
 
 ## 🎯 Project Purpose
 
