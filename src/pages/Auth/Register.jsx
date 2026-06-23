@@ -28,6 +28,7 @@ const Register = () => {
     const email = form.email.value;
     const photo = form.photo.value;
     const password = form.password.value;
+    const role = form.role.value;
 
     if (password.length < 6) return toast.error('Password must be at least 6 characters');
     if (!/[A-Z]/.test(password)) return toast.error('Password must contain an uppercase letter');
@@ -36,7 +37,7 @@ const Register = () => {
     setLoading(true);
     try {
       await register(name, email, password, photo);
-      await saveUser({ name, email, photo, role: 'buyer', status: 'active' });
+      await saveUser({ name, email, photo, role: role === 'seller' ? 'seller' : 'buyer', status: 'active' });
       toast.success('Registration successful!');
       navigate(from, { replace: true });
     } catch (err) {
@@ -78,6 +79,13 @@ const Register = () => {
           <input name="name" required placeholder="Full Name" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" />
           <input name="email" type="email" required placeholder="Email" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" />
           <input name="photo" placeholder="Photo URL (optional)" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-1">I want to register as</label>
+            <select name="role" defaultValue="buyer" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="buyer">Buyer — browse and purchase products</option>
+              <option value="seller">Seller — list and sell products</option>
+            </select>
+          </div>
           <div className="relative">
             <input name="password" type={showPass ? 'text' : 'password'} required placeholder="Password" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" />
             <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
