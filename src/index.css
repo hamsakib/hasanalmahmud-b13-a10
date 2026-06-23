@@ -1,25 +1,19 @@
 @import "tailwindcss";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Note: do NOT add an unlayered `* { margin:0; padding:0 }` reset here —
+   in Tailwind v4 it overrides layered utilities like mx-auto / px-4 and
+   breaks centering and spacing. Tailwind's preflight already resets these. */
 
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
   background: #f9fafb;
   color: #1f2937;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-#root {
-  min-height: 100vh;
 }
 
 .line-clamp-1 {
