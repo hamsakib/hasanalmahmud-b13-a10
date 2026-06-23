@@ -124,8 +124,10 @@ const DashboardLayout = () => {
           </button>
           <span className="font-bold text-blue-900">ReSell Hub</span>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto p-4 lg:p-8">
+          <div className="max-w-7xl mx-auto w-full">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

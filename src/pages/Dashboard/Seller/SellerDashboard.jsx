@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { FiPackage, FiTrendingUp, FiDollarSign, FiClock } from 'react-icons/fi';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import StatCard from '../../../components/dashboard/StatCard';
+import DashboardHeader from '../../../components/dashboard/DashboardHeader';
 import { Spinner } from '../../../components/shared/Loader';
 
 const SellerDashboard = () => {
@@ -15,7 +16,7 @@ const SellerDashboard = () => {
   return (
     <div>
       <Helmet><title>Seller Dashboard | ReSell Hub</title></Helmet>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Seller Dashboard</h1>
+      <DashboardHeader title="Seller Dashboard" subtitle="Your business performance at a glance" />
 
       {isLoading ? <Spinner /> : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
