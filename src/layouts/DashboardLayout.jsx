@@ -29,6 +29,7 @@ const adminLinks = [
   { to: '/dashboard/manage-users', label: 'Manage Users', icon: <FiUsers /> },
   { to: '/dashboard/admin-products', label: 'Manage Products', icon: <FiList /> },
   { to: '/dashboard/admin-orders', label: 'Manage Orders', icon: <FiTruck /> },
+  { to: '/dashboard/admin-payments', label: 'Transactions', icon: <FiCreditCard /> },
   { to: '/dashboard/platform-analytics', label: 'Analytics', icon: <FiBarChart2 /> },
 ];
 

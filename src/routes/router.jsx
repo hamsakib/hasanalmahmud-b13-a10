@@ -33,6 +33,7 @@ import AdminDashboard from '../pages/Dashboard/Admin/AdminDashboard';
 import ManageUsers from '../pages/Dashboard/Admin/ManageUsers';
 import AdminProducts from '../pages/Dashboard/Admin/AdminProducts';
 import AdminOrders from '../pages/Dashboard/Admin/AdminOrders';
+import AdminPayments from '../pages/Dashboard/Admin/AdminPayments';
 import PlatformAnalytics from '../pages/Dashboard/Admin/PlatformAnalytics';
 
 import Checkout from '../pages/Payment/Checkout';
@@ -83,6 +84,7 @@ const router = createBrowserRouter([
       { path: 'manage-users', element: <AdminRoute><ManageUsers /></AdminRoute> },
       { path: 'admin-products', element: <AdminRoute><AdminProducts /></AdminRoute> },
       { path: 'admin-orders', element: <AdminRoute><AdminOrders /></AdminRoute> },
+      { path: 'admin-payments', element: <AdminRoute><AdminPayments /></AdminRoute> },
       { path: 'platform-analytics', element: <AdminRoute><PlatformAnalytics /></AdminRoute> },
     ],
   },

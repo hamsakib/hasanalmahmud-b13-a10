@@ -71,6 +71,22 @@ const ProductDetails = () => {
     onError: () => toast.error('Failed to report'),
   });
 
+  const reviewMutation = useMutation({
+    mutationFn: ({ rating, comment }) => axiosSecure.post('/api/reviews', { productId: id, rating, comment }),
+    onSuccess: () => {
+      toast.success('Review submitted!');
+      queryClient.invalidateQueries({ queryKey: ['reviews', id] });
+    },
+    onError: () => toast.error('Failed to submit review'),
+  });
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    reviewMutation.mutate({ rating: parseInt(form.rating.value), comment: form.comment.value });
+    form.reset();
+  };
+
   if (isLoading) return <FullPageLoader />;
   if (!product) return <div className="text-center py-20">Product not found.</div>;
 
@@ -192,6 +208,24 @@ const ProductDetails = () => {
       {/* Reviews */}
       <div className="mt-16">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Reviews ({reviews.length})</h2>
+
+        {/* Write a review (logged-in users) */}
+        {user && (
+          <form onSubmit={handleReviewSubmit} className="bg-white rounded-xl border border-gray-100 p-5 mb-6">
+            <h3 className="font-semibold text-gray-900 mb-3">Write a Review</h3>
+            <div className="flex items-center gap-3 mb-3">
+              <label className="text-sm text-gray-600">Rating:</label>
+              <select name="rating" defaultValue="5" className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none">
+                {[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} ★</option>)}
+              </select>
+            </div>
+            <textarea name="comment" required rows={3} placeholder="Share your experience with this product..." className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none mb-3" />
+            <button type="submit" disabled={reviewMutation.isPending} className="bg-blue-600 text-white font-medium px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50">
+              {reviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
+            </button>
+          </form>
+        )}
+
         {reviews.length === 0 ? (
           <p className="text-gray-500">No reviews yet.</p>
         ) : (

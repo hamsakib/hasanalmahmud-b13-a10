@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { FiX } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import { Spinner } from '../../../components/shared/Loader';
@@ -17,6 +19,7 @@ const statusStyles = {
 const BuyerOrders = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
+  const [details, setDetails] = useState(null);
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['my-orders'],
@@ -74,7 +77,8 @@ const BuyerOrders = () => {
                         {order.orderStatus}
                       </span>
                     </td>
-                    <td className="px-4 py-3 space-x-2">
+                    <td className="px-4 py-3 space-x-2 whitespace-nowrap">
+                      <button onClick={() => setDetails(order)} className="text-gray-600 hover:underline">Details</button>
                       {order.paymentStatus !== 'paid' && (
                         <Link to={`/checkout/${order._id}`} className="text-blue-600 hover:underline">Pay</Link>
                       )}
@@ -86,6 +90,34 @@ const BuyerOrders = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Order details modal */}
+      {details && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setDetails(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-gray-900">Order Details</h2>
+              <button onClick={() => setDetails(null)} className="text-gray-400 hover:text-gray-600"><FiX /></button>
+            </div>
+            <div className="flex gap-3 mb-4">
+              <img src={details.productImage || 'https://via.placeholder.com/64'} alt="" className="w-16 h-16 rounded-lg object-cover" />
+              <div>
+                <p className="font-medium text-gray-900">{details.productTitle}</p>
+                <p className="text-sm text-gray-500">Seller: {details.sellerInfo?.name}</p>
+              </div>
+            </div>
+            <div className="text-sm space-y-2 border-t border-gray-100 pt-3">
+              <div className="flex justify-between"><span className="text-gray-500">Order ID</span><span className="font-mono text-xs">{details._id}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Quantity</span><span>{details.quantity || 1}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Amount</span><span className="font-semibold text-blue-700">৳{details.amount?.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Payment</span><span className="capitalize">{details.paymentStatus}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Order Status</span><span className="capitalize">{details.orderStatus}</span></div>
+              {details.transactionId && <div className="flex justify-between"><span className="text-gray-500">Transaction</span><span className="font-mono text-xs">{details.transactionId.slice(0, 18)}…</span></div>}
+              <div className="flex justify-between"><span className="text-gray-500">Date</span><span>{new Date(details.createdAt).toLocaleString()}</span></div>
+            </div>
           </div>
         </div>
       )}
