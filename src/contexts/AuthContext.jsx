@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import { authClient } from '../lib/auth-client';
 
 const AuthContext = createContext();
@@ -22,6 +22,22 @@ export const AuthProvider = ({ children }) => {
 
   const userRole = rawUser ? rawUser.role || 'buyer' : null;
   const loading = isPending;
+
+  // Once a Better Auth session exists, fetch a JWT from it and cache it. The
+  // secure axios client sends this JWT as a Bearer token; the backend verifies
+  // it on private APIs (with the session cookie as a fallback in the meantime).
+  useEffect(() => {
+    if (!rawUser) {
+      localStorage.removeItem('token');
+      return;
+    }
+    let active = true;
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/jwt`, { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (active && d?.token) localStorage.setItem('token', d.token); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [rawUser?.id]);
 
   const register = async (name, email, password, photo = '', role = 'buyer') => {
     const { data, error } = await authClient.signUp.email({
@@ -49,6 +65,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    localStorage.removeItem('token');
     await authClient.signOut();
   };
 
