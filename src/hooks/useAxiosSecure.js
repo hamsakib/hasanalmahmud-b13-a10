@@ -2,22 +2,15 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
+// Sends the Better Auth session cookie with every request (withCredentials).
 const axiosSecure = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
 
 const useAxiosSecure = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-
-  axiosSecure.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem('token');
-      if (token) config.headers.Authorization = `Bearer ${token}`;
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
 
   axiosSecure.interceptors.response.use(
     (response) => response,

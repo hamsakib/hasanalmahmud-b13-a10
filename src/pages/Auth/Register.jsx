@@ -6,20 +6,14 @@ import { FcGoogle } from 'react-icons/fc';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
-import useAxiosPublic from '../../hooks/useAxiosPublic';
 
 const Register = () => {
   const { register, googleLogin } = useAuth();
-  const axiosPublic = useAxiosPublic();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/';
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const saveUser = async (userData) => {
-    try { await axiosPublic.post('/api/users', userData); } catch { /* user may exist */ }
-  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -36,8 +30,9 @@ const Register = () => {
 
     setLoading(true);
     try {
-      await register(name, email, password, photo);
-      await saveUser({ name, email, photo, role: role === 'seller' ? 'seller' : 'buyer', status: 'active' });
+      // Better Auth creates the user with the chosen role (server coerces anything
+      // other than "seller" to "buyer") and signs them in.
+      await register(name, email, password, photo, role === 'seller' ? 'seller' : 'buyer');
       toast.success('Registration successful!');
       navigate(from, { replace: true });
     } catch (err) {
@@ -49,16 +44,7 @@ const Register = () => {
 
   const handleGoogle = async () => {
     try {
-      const result = await googleLogin();
-      await saveUser({
-        name: result.user.displayName,
-        email: result.user.email,
-        photo: result.user.photoURL,
-        role: 'buyer',
-        status: 'active',
-      });
-      toast.success('Signed in with Google!');
-      navigate(from, { replace: true });
+      await googleLogin(window.location.origin + from);
     } catch (err) {
       toast.error(err.message || 'Google sign-in failed');
     }

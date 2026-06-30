@@ -6,11 +6,9 @@ import { FcGoogle } from 'react-icons/fc';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
-import useAxiosPublic from '../../hooks/useAxiosPublic';
 
 const Login = () => {
   const { login, googleLogin } = useAuth();
-  const axiosPublic = useAxiosPublic();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/';
@@ -34,18 +32,9 @@ const Login = () => {
 
   const handleGoogle = async () => {
     try {
-      const result = await googleLogin();
-      try {
-        await axiosPublic.post('/api/users', {
-          name: result.user.displayName,
-          email: result.user.email,
-          photo: result.user.photoURL,
-          role: 'buyer',
-          status: 'active',
-        });
-      } catch { /* exists */ }
-      toast.success('Signed in with Google!');
-      navigate(from, { replace: true });
+      // Full-page redirect to Google; Better Auth creates the user (role: buyer)
+      // on first sign-in and returns the user to `from`.
+      await googleLogin(window.location.origin + from);
     } catch (err) {
       toast.error(err.message || 'Google sign-in failed');
     }
