@@ -19,7 +19,7 @@ Many people own products that are still usable but no longer needed. ReSell Hub 
 ## ✨ Key Features
 
 - **Role-based system** — Buyer, Seller, and Admin dashboards, each with dedicated features and permissions.
-- **Authentication** — Email/password + Google sign-in via Firebase, with JWT-protected private routes & APIs.
+- **Authentication** — Email/password + Google sign-in via [Better Auth](https://www.better-auth.com), with session-protected private routes & APIs.
 - **Product marketplace** — Browse, search by name/category, filter by condition & price range, sort by price, and paginate.
 - **Product details** — Image gallery, seller info, verified-seller badge, reviews, wishlist & report buttons.
 - **Seller tools** — Add/edit/delete products (CRUD), manage incoming orders with status flow (Pending → Accepted → Processing → Shipped → Delivered), and a sales analytics page with charts.
@@ -44,7 +44,7 @@ Many people own products that are still usable but no longer needed. ReSell Hub 
 | `react-router-dom` | Client-side routing |
 | `@tanstack/react-query` | Server state / data fetching & caching |
 | `axios` | HTTP client (public + secure interceptor instances) |
-| `firebase` | Authentication (email/password + Google) |
+| `better-auth` | Authentication (email/password + Google sessions) |
 | `@stripe/react-stripe-js` / `@stripe/stripe-js` | Stripe payment integration |
 | `recharts` | Dashboard charts & analytics |
 | `framer-motion` | Animations |
@@ -63,16 +63,11 @@ npm run dev
 
 ### Environment Variables (`.env.local`)
 ```
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
 VITE_API_URL=http://localhost:5000
 VITE_STRIPE_PUBLISHABLE_KEY=
 VITE_IMGBB_API_KEY=
 ```
+> Google OAuth credentials live on the **server** (Better Auth), not the client.
 
 ## 📁 Tech Stack
-React 19 · Vite · Tailwind CSS v4 · Firebase Auth · TanStack Query · Stripe · Recharts · Framer Motion
+React 19 · Vite · Tailwind CSS v4 · Better Auth · TanStack Query · Stripe · Recharts · Framer Motion

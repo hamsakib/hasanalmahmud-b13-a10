@@ -2,8 +2,12 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
+// Private API client. Sends the JWT (issued from the Better Auth session) as a
+// Bearer token, and also sends the session cookie (withCredentials) as a fallback
+// for the brief window before the JWT has been fetched.
 const axiosSecure = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
 
 const useAxiosSecure = () => {

@@ -1,69 +1,73 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-} from 'firebase/auth';
-import { auth } from '../firebase/firebase.config';
-import axios from 'axios';
+import { createContext, useContext, useEffect } from 'react';
+import { authClient } from '../lib/auth-client';
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-const googleProvider = new GoogleAuthProvider();
-const API_URL = import.meta.env.VITE_API_URL;
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [userRole, setUserRole] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, isPending } = authClient.useSession();
+  const rawUser = session?.user || null;
 
-  const register = async (name, email, password, photoURL = '') => {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(result.user, { displayName: name, photoURL });
-    return result;
+  // Normalize the Better Auth user to the shape the rest of the app expects
+  // (it reads `displayName` / `photoURL`). Google fills the built-in `image`;
+  // email/password users fill `photo`.
+  const user = rawUser
+    ? {
+        ...rawUser,
+        displayName: rawUser.name,
+        photoURL: rawUser.image || rawUser.photo || '',
+      }
+    : null;
+
+  const userRole = rawUser ? rawUser.role || 'buyer' : null;
+  const loading = isPending;
+
+  // Once a Better Auth session exists, fetch a JWT from it and cache it. The
+  // secure axios client sends this JWT as a Bearer token; the backend verifies
+  // it on private APIs (with the session cookie as a fallback in the meantime).
+  useEffect(() => {
+    if (!rawUser) {
+      localStorage.removeItem('token');
+      return;
+    }
+    let active = true;
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/jwt`, { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (active && d?.token) localStorage.setItem('token', d.token); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [rawUser?.id]);
+
+  const register = async (name, email, password, photo = '', role = 'buyer') => {
+    const { data, error } = await authClient.signUp.email({
+      name,
+      email,
+      password,
+      image: photo,
+      photo,
+      role,
+    });
+    if (error) throw new Error(error.message || 'Registration failed');
+    return data;
   };
 
-  const login = (email, password) =>
-    signInWithEmailAndPassword(auth, email, password);
+  const login = async (email, password) => {
+    const { data, error } = await authClient.signIn.email({ email, password });
+    if (error) throw new Error(error.message || 'Invalid credentials');
+    return data;
+  };
 
-  const googleLogin = () => signInWithPopup(auth, googleProvider);
+  // Google is a full-page redirect: after consent the user returns to `callbackURL`.
+  const googleLogin = async (callbackURL = window.location.origin) => {
+    const { error } = await authClient.signIn.social({ provider: 'google', callbackURL });
+    if (error) throw new Error(error.message || 'Google sign-in failed');
+  };
 
   const logout = async () => {
     localStorage.removeItem('token');
-    await signOut(auth);
+    await authClient.signOut();
   };
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        try {
-          const { data } = await axios.post(`${API_URL}/api/auth/jwt`, {
-            email: currentUser.email,
-          });
-          localStorage.setItem('token', data.token);
-          const roleRes = await axios.get(
-            `${API_URL}/api/users/role/${currentUser.email}`,
-            { headers: { Authorization: `Bearer ${data.token}` } }
-          );
-          setUserRole(roleRes.data.role);
-        } catch {
-          setUserRole('buyer');
-        }
-      } else {
-        localStorage.removeItem('token');
-        setUserRole(null);
-      }
-      setLoading(false);
-    });
-    return unsubscribe;
-  }, []);
 
   const value = { user, userRole, loading, register, login, googleLogin, logout };
 

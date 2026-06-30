@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { updateProfile } from 'firebase/auth';
 import toast from 'react-hot-toast';
-import { auth } from '../../../firebase/firebase.config';
+import { authClient } from '../../../lib/auth-client';
 import { useAuth } from '../../../contexts/AuthContext';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 
@@ -21,7 +20,8 @@ const BuyerProfile = () => {
 
   const updateMutation = useMutation({
     mutationFn: async () => {
-      await updateProfile(auth.currentUser, { displayName: name, photoURL: photo });
+      // Update the Better Auth user (name + image) and the app's profile fields.
+      await authClient.updateUser({ name, image: photo, photo });
       await axiosSecure.patch(`/api/users/${user.email}`, { name, photo });
     },
     onSuccess: () => {
